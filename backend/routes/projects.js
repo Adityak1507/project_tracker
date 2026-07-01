@@ -29,7 +29,7 @@ router.get('/:id', async (req, res) => {
 
 // POST new project
 router.post('/', async (req, res) => {
-    const { project_name, client_name, target_date, stage, sub_stage, description } = req.body;
+    const { project_name, client_name, target_date, stage, sdlc_timeline, description } = req.body;
     
     // basic validation
     if (!project_name || !client_name || !target_date) {
@@ -38,14 +38,14 @@ router.post('/', async (req, res) => {
 
     try {
         const [result] = await db.query(
-            `INSERT INTO projects (project_name, client_name, target_date, stage, sub_stage, description) 
+            `INSERT INTO projects (project_name, client_name, target_date, stage, sdlc_timeline, description) 
              VALUES (?, ?, ?, ?, ?, ?)`,
             [
                 project_name, 
                 client_name, 
                 target_date, 
                 stage || 'start', 
-                stage === 'start' ? sub_stage : null, 
+                sdlc_timeline ? JSON.stringify(sdlc_timeline) : null, 
                 description || ''
             ]
         );
@@ -58,7 +58,7 @@ router.post('/', async (req, res) => {
 
 // PUT update project
 router.put('/:id', async (req, res) => {
-    const { project_name, client_name, target_date, stage, sub_stage, description } = req.body;
+    const { project_name, client_name, target_date, stage, sdlc_timeline, description } = req.body;
     const { id } = req.params;
 
     try {
@@ -74,7 +74,7 @@ router.put('/:id', async (req, res) => {
                 client_name = ?, 
                 target_date = ?, 
                 stage = ?, 
-                sub_stage = ?, 
+                sdlc_timeline = ?, 
                 description = ? 
              WHERE id = ?`,
             [
@@ -82,7 +82,7 @@ router.put('/:id', async (req, res) => {
                 client_name, 
                 target_date, 
                 stage, 
-                stage === 'start' ? sub_stage : null, 
+                sdlc_timeline ? JSON.stringify(sdlc_timeline) : null, 
                 description, 
                 id
             ]
